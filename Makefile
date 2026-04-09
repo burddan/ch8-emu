@@ -7,6 +7,9 @@ CC = gcc
 
 INCS = $(shell pkg-config --cflags sdl3)
 LIBS = $(shell pkg-config --libs sdl3)
+GTEST_FLAGS = -lgtest -lgtest_main -lpthread
+TEST_SRC = tests/test_cpu.cpp ch8.c
+TEST_BIN = test_runner
 
 CFLAGS  = -O2 -Wall -Wextra -std=c11 -D_XOPEN_SOURCE=600 $(INCS)
 LDFLAGS = $(LIBS) -lm
@@ -45,5 +48,10 @@ install: ch8
 
 uninstall:
 	rm -f $(DESTDIR)$(BINDIR)/ch8
+
+test:
+	$(CC) $(CFLAGS) -c ch8.c -o ch8.o
+	$(CXX) -Wall -I./ tests/test_cpu.cpp ch8.o -o $(TEST_BIN) $(GTEST_FLAGS)
+	./$(TEST_BIN)
 
 .PHONY: all clean debug dist install uninstall run
