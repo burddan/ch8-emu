@@ -1,4 +1,6 @@
-This project is a implementation of a CHIP-8 emulator written in pure C.  
+# CHIP-8 Emulator
+
+This project is an implementation of a CHIP-8 emulator written in pure C.  
 CHIP-8 is a virtual machine from the 1970s, often used as a starting point for emulator development.
 
 ## Features
@@ -18,7 +20,18 @@ CHIP-8 is a virtual machine from the 1970s, often used as a starting point for e
   <p><em>Chip-8 interpreter running classic ROMs: Ping Pong, Tetris, Tank</em></p>
 </div>
 
-This project includes unit tests using **Google Test**.
+## Requirements
 
+- **SDL2** - Graphics and input handling
+- **Google Test** - Unit testing framework
+- **make** - Build automation
+- **C compiler** (gcc/clang)
+
+## Installation
+
+### Install Dependencies
+
+**Ubuntu/Debian:**
 ```bash
-make test
+sudo apt update
+sudo apt install libsdl2-dev libgtest-dev cmake make gcc
