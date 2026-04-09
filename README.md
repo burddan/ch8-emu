@@ -34,21 +34,23 @@ CHIP-8 is a virtual machine from the 1970s, often used as a starting point for e
 **Ubuntu/Debian:**
 ```bash
 sudo apt install libsdl2-dev libgtest-dev cmake make gcc
+```
 
 **Fedora:**
 ```bash
 sudo dnf install SDL2-devel gtest-devel cmake make gcc
-
+```
 **Arch:**
 ```bash
 sudo pacman -S sdl2 gtest cmake make gcc
+```
 
-Build and Install
-# Build the emulator
+```bash
 make
-
-# Install to /usr/local/bin (requires sudo)
 sudo make install
+```
 
 After installation, you can run the emulator from anywhere:
+```bash
 chip8 path/to/rom.ch8
+```
