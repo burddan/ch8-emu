@@ -1,8 +1,6 @@
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "sdl.h"
 
@@ -27,7 +25,7 @@ bool sdl_init(SdlContext *sdl) {
 	                                 SDL_LOGICAL_PRESENTATION_LETTERBOX);
 
 	sdl->texture = SDL_CreateTexture(sdl->renderer,
-	                                 SDL_PIXELFORMAT_RGBA32,
+	                                 SDL_PIXELFORMAT_XRGB8888,
 	                                 SDL_TEXTUREACCESS_STREAMING,
 	                                 SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -57,9 +55,15 @@ bool sdl_init(SdlContext *sdl) {
 	return true;
 }
 
-void sdl_update_display(SdlContext *sdl, const uint8_t *framebuffer, uint32_t color_foreground, uint32_t color_background) {
+void sdl_update_display(SdlContext *sdl, const uint8_t *framebuffer, Colorscheme colors) {
 	for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
-		sdl->pixel_buffer[i] = framebuffer[i] ? color_foreground : color_background;
+		if (framebuffer[i]) {
+			sdl->pixel_buffer[i] = colors.fg;
+		}
+
+		else {
+			sdl->pixel_buffer[i] = colors.bg;
+		}
 	}
 
 	SDL_UpdateTexture(sdl->texture, NULL, sdl->pixel_buffer, SCREEN_WIDTH * sizeof(uint32_t));
