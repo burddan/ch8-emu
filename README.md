@@ -45,6 +45,8 @@ sudo dnf install SDL2-devel gtest-devel cmake make gcc
 sudo pacman -S sdl2 gtest cmake make gcc
 ```
 
+
+## Compile
 ```bash
 make
 sudo make install
