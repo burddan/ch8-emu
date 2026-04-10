@@ -15,7 +15,7 @@ typedef struct {
 	uint8_t  stack_pointer;
 	uint8_t  delay_timer;
 	uint8_t  sound_timer;
-	uint8_t  framebuffer[64 * 32];
+	uint8_t  framebuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
 	uint8_t  keypad[16];
 	bool     needs_draw;
 	bool     running;

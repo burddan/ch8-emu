@@ -1,9 +1,15 @@
 VERSION = 0.1
+PREFIX  = /usr/local
+BINDIR  = $(PREFIX)/bin
 
-PREFIX = /usr/local
-BINDIR = $(PREFIX)/bin
+OS := $(shell uname -s)
+CC  = gcc
 
-CC = gcc
+ifeq ($(OS), Darwin)
+	CC = clang
+	HOMEBREW_PREFIX := $(shell brew --prefix 2>/dev/null || echo /opt/homebrew)
+	export PKG_CONFIG_PATH := $(HOMEBREW_PREFIX)/lib/pkgconfig:$(PKG_CONFIG_PATH)
+endif
 
 INCS = $(shell pkg-config --cflags sdl3)
 LIBS = $(shell pkg-config --libs sdl3)
@@ -11,10 +17,10 @@ GTEST_FLAGS = -lgtest -lgtest_main -lpthread
 TEST_SRC = tests/test_cpu.cpp ch8.c
 TEST_BIN = test_runner
 
-CFLAGS  = -O2 -Wall -Wextra -std=c11 -D_XOPEN_SOURCE=600 $(INCS)
-LDFLAGS = $(LIBS) -lm
-
-DBGFLAGS = --O0 -g -Wall -Wextra -std=c11 -D_XOPEN_SOURCE=600 $(INCS)
+BASE_FLAGS = -Wall -Wextra -std=c11 -D_XOPEN_SOURCE=600 $(INCS)
+CFLAGS     = -O2 $(BASE_FLAGS)
+DBGFLAGS   = -O0 -g $(BASE_FLAGS)
+LDFLAGS    = $(LIBS) -lm
 
 SRC = ch8.c main.c sdl.c
 OBJ = $(SRC:.c=.o)
