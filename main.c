@@ -1,20 +1,39 @@
+#include <getopt.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "ch8.h"
 #include "config.h"
 #include "sdl.h"
 
-static void parse_mode_flag(Chip8State *cpu, const char *flag) {
-	if (strcmp(flag, "modern") == 0) {
+static void usage(const char *prog) {
+	fprintf(stderr,
+		"usage: %s [options] <rom.ch8>\n"
+		"\n"
+		"options:\n"
+		"  -q, --quirks <mode>   original (default) or modern\n"
+		"  -c, --color  <name>   default, blue, matrix, warm\n"
+		"  -h, --help\n",
+		prog);
+}
+
+static void apply_quirks(Chip8State *cpu, const char *mode) {
+	if (strcmp(mode, "modern") == 0) {
 		cpu->quirk_shift      = true;
 		cpu->quirk_load_store = true;
 		cpu->quirk_jump       = false;
 	}
-	else {
+
+	else if (strcmp(mode, "original") == 0) {
 		cpu->quirk_shift      = false;
 		cpu->quirk_load_store = false;
 		cpu->quirk_jump       = false;
+	}
+
+	else {
+		fprintf(stderr, "error: unknown quirks mode '%s' (use: original, modern)\n", mode);
+		exit(1);
 	}
 }
 
@@ -22,33 +41,48 @@ int main(int argc, char *argv[]) {
 	Chip8State cpu;
 	SdlContext sdl;
 
-	if (argc < 2) {
-		printf("usage: %s <rom.ch8> [modern|original] [matrix|warm|cga|blue]\n", argv[0]);
+	const char        *color_name = NULL;
+	const char        *quirks     = NULL;
+
+	static struct option long_opts[] = {
+		{ "quirks", required_argument, NULL, 'q' },
+		{ "color",  required_argument, NULL, 'c' },
+		{ "help",   no_argument,       NULL, 'h' },
+		{ NULL, 0, NULL, 0 }
+	};
+
+	int opt;
+	while ((opt = getopt_long(argc, argv, "q:c:h", long_opts, NULL)) != -1) {
+		switch (opt) {
+		case 'q': quirks     = optarg; break;
+		case 'c': color_name = optarg; break;
+		case 'h': usage(argv[0]); return 0;
+		default:  usage(argv[0]); return 1;
+		}
+	}
+
+	if (optind >= argc) {
+		fprintf(stderr, "error: no ROM file specified\n");
+		usage(argv[0]);
 		return 1;
 	}
+
+	const char *rom = argv[optind];
 
 	chip8_init(&cpu);
 
-	if (!chip8_load_rom(&cpu, argv[1])) {
-		printf("error: failed to open ROM file '%s'\n", argv[1]);
+	if (quirks)
+		apply_quirks(&cpu, quirks);
+
+	Colorscheme colors = get_colorscheme(color_name);
+
+	if (!chip8_load_rom(&cpu, rom)) {
+		fprintf(stderr, "error: failed to open ROM file '%s'\n", rom);
 		return 1;
 	}
 
-	if (argc >= 3) {
-		parse_mode_flag(&cpu, argv[2]);
-	}
-
-	Colorscheme colors;
-	if (argc >= 4) {
-		colors = get_colorscheme(argv[3]);
-	}
-
-	else {
-		colors = (Colorscheme) { COLOR_FG_DEFAULT, COLOR_BG_DEFAULT };
-	}
-
 	if (!sdl_init(&sdl)) {
-		printf("error: failed to initialize SDL\n");
+		fprintf(stderr, "error: failed to initialize SDL\n");
 		return 1;
 	}
 
